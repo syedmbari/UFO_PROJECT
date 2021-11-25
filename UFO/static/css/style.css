@@ -1,15 +1,12 @@
-body {
+
+
+  body {
 
     color: #f7f7f7;
   }
- 
- .tag {
-     font-family: inherit; 
-     font-size: 1rem;
-    }  
 
-.jumbotron {
-    background-image: url("C:/Users/lengu/Desktop/Data Boost Camp/UFOs/nasa.jpg");
+  .jumbotron {
+    background-image: url("../images/nasa.jpeg");
     background-size: 100% 100%;
     text-align: center;
   }

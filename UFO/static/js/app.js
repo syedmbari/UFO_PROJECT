@@ -1,84 +1,71 @@
-// import data from data.js
-const tableData = data;
+// from data.js
+var tableData = data;
 
-// reference the HTML table(output) using d3 library
-var tbody = d3.select('tbody');
+//** Level 1: Automatic Table and Date Search
+//*** Write code that appends a table to your web page and then adds new rows of data for each UFO sighting.
 
-// Function of populate data into html table
-function buildTable(data) {
-    // init table data
-    tbody.html('');
+// Get a reference to the table body
+var tbody = d3.select("tbody");
 
-    // first array loop for <tr>
-    data.forEach((dataRow) => {
-        let row = tbody.append('tr'); //html
-        //second loop for <td>
-        Object.values(dataRow).forEach((val) =>{
-            let cell = row.append('td'); //html
-            // d3 funtion 
-            cell.text(val);
-        });
-    });
+// Loop through each ufo object in the data array
+tableData.forEach((ufo) => {
 
-};
+	// Use d3 to append one table row `tr` for each ufo object
+	var row = tbody.append("tr");
 
-// EXTRA: Create a variable to keep track of all the filters as an object.
-var clearEntries = d3.select("#clear-btn");
-clearEntries.on("click", function() {
-  location.reload();
+	// Use `Object.entries` and forEach to iterate through keys and values
+	Object.entries(ufo).forEach(([key, value]) => {
+
+		// Use d3 to append one cell per ufo object value (date, city, state, country, shape, duration, and comments)  
+		var cell = row.append("td");
+		cell.text(value);
+	});
 });
 
+//*** Use a date form in your HTML document and write JavaScript code that will listen
+//for events and search through the date/time column to find rows that match user input.
 
+// Select the button
+var button = d3.select("#filter-btn");
 
-// 1. Create a variable to keep track of all the filters as an object.
-var filters = {
+// Select the form
+var form = d3.select("form");
+
+// Create event handlers 
+button.on("click", runEnter);
+form.on("submit", runEnter);
+
+// Complete the event handler function for the form
+function runEnter() {
+
+  // Prevent the page from refreshing
+  d3.event.preventDefault();
+
+  // Select the input element and get the raw HTML node
+  var inputElement = d3.select(".form-control");
+
+  // Get the value property of the input element
+  var inputValue = inputElement.property("value");
+
+  // Use the form input to filter the data by datetime
+	var results = tableData.filter(ufo => ufo.datetime === inputValue);
+	
+	// Clear out current contents in the table
+	tbody.html("");
+
+	// Handle no matching results
+	if (results.length === 0) {
+		tbody.text(`No ufo sightings on ${inputValue}.`);
+	}
+
+	// Handle matching results
+	else {
+		results.forEach((ufo) => {
+			var row = tbody.append("tr");
+			Object.entries(ufo).forEach(([key, value]) => {
+				var cell = row.append("td");
+				cell.text(value);
+			});
+		});
+	};
 };
-
-// 3. Use this function to update the filters. 
-function updateFilters() {
-
-    // 4a. Save the element that was changed as a variable.
-    let inputElement = d3.select(this);
-
-    // 4b. Save the value that was changed as a variable.
-    let inputValue = inputElement.property("value");
-
-    // 4c. Save the id of the filter that was changed as a variable.
-    let inputID = inputElement.attr("id");
-  
-    // 5. If a filter value was entered then add that filterId and value
-    // to the filters list. Otherwise, clear that filter from the filters object.
-
-      if (inputValue) {
-        filters[inputID] = inputValue;
-    } else{filters ={};};
-  
-  
-    // 6. Call function to apply all filters and rebuild the table
-    filterTable(filters);
-};
-
-// 7. Use this function to filter the table when data is entered.
-function filterTable(obj) {
-  
-    // 8. Set the filtered data to the tableData.
-    let filteredData = tableData;
-  
-    // 9. Loop through all of the filters and keep any data that
-    // matches the filter values
-    Object.entries(obj).forEach(([fkey, fval]) =>{
-        
-      filteredData = filteredData.filter((row) => row[fkey] === fval)
-          
-
-  });
-  
-    // 10. Finally, rebuild the table using the filtered data
-    buildTable(filteredData);
-};
-  
-  // 2. Attach an event to listen for changes to each filter
-  d3.selectAll("input").on("change",updateFilters);
-  
-  // Build the table when the page loads
-  buildTable(tableData);
